@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Assignment - Assignment Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="card-title mb-0">Create New Assignment</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+                        <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" required>
+                        {% for error in form.title.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" rows="4" class="form-control {% if form.description.errors %}is-invalid{% endif %}" required></textarea>
+                        {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.file.id_for_label }}" class="form-label">Assignment File (Optional)</label>
+                        <input type="file" name="{{ form.file.name }}" id="{{ form.file.id_for_label }}" class="form-control {% if form.file.errors %}is-invalid{% endif %}">
+                        {% for error in form.file.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                        <div class="form-text">Upload any reference material or instructions file.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.deadline.id_for_label }}" class="form-label">Deadline</label>
+                        <input type="datetime-local" name="{{ form.deadline.name }}" id="{{ form.deadline.id_for_label }}" class="form-control {% if form.deadline.errors %}is-invalid{% endif %}" required>
+                        {% for error in form.deadline.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success">Create Assignment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - Assignment Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Student Dashboard</h1>
+        
+        <ul class="nav nav-tabs mb-4" id="assignmentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    Pending Assignments
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab">
+                    Submitted Assignments
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab">
+                    Past Deadline
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="assignmentTabContent">
+            <!-- Pending Assignments Tab -->
+            <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                <div class="row">
+                    {% for assignment in assignments %}
+                        {% if assignment.id not in submitted_assignments and assignment.deadline > now %}
+                            <div class="col-md-4">
+                                <div class="card assignment-card shadow">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="card-title mb-0">{{ assignment.title }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ assignment.description|truncatewords:20 }}</p>
+                                        <p><strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y H:i" }}</p>
+                                        <p><strong>Time Remaining:</strong>
+                                            <span class="deadline-alert">
+                                                {% with timediff=assignment.deadline|timeuntil %}
+                                                    {{ timediff }}
+                                                {% endwith %}
+                                            </span>
+                                        </p>
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'view_assignment' assignment.id %}" class="btn btn-primary">View & Submit</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info">No pending assignments.</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Submitted Assignments Tab -->
+            <div class="tab-pane fade" id="submitted" role="tabpanel" aria-labelledby="submitted-tab">
+                <div class="row">
+                    {% for submission in submissions %}
+                        {% if submission.assignment.deadline > now %}
+                            <div class="col-md-4">
+                                <div class="card assignment-card shadow">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="card-title mb-0">{{ submission.assignment.title }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ submission.assignment.description|truncatewords:20 }}</p>
+                                        <p><strong>Deadline:</strong> {{ submission.assignment.deadline|date:"M d, Y H:i" }}</p>
+                                        <p><strong>Submitted:</strong> {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
+                                        {% if submission.grade %}
+                                            <p><strong>Grade:</strong> {{ submission.grade }}</p>
+                                        {% else %}
+                                            <p class="text-muted">Not graded yet</p>
+                                        {% endif %}
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'view_assignment' submission.assignment.id %}" class="btn btn-success">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info">No submitted assignments.</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Past Deadline Tab -->
+            <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+                <div class="row">
+                    {% for assignment in assignments %}
+                        {% if assignment.deadline < now %}
+                            <div class="col-md-4">
+                                <div class="card assignment-card shadow">
+                                    <div class="card-header {% if assignment.id in submitted_assignments %}bg-secondary{% else %}bg-danger{% endif %} text-white">
+                                        <h5 class="card-title mb-0">{{ assignment.title }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ assignment.description|truncatewords:20 }}</p>
+                                        <p><strong>Deadline:</strong> <span class="past-deadline">{{ assignment.deadline|date:"M d, Y H:i" }}</span></p>
+                                        <p><strong>Status:</strong> 
+                                            {% if assignment.id in submitted_assignments %}
+                                                <span class="badge bg-success">Submitted</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Missed</span>
+                                            {% endif %}
+                                        </p>
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'view_assignment' assignment.id %}" class="btn {% if assignment.id in submitted_assignments %}btn-secondary{% else %}btn-danger{% endif %}">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info">No past deadline assignments.</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Grade Submission - Assignment Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'teacher_dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'view_assignment' submission.assignment.id %}">{{ submission.assignment.title }}</a></li>
+                <li class="breadcrumb-item active">Grade Submission</li>
+            </ol>
+        </nav>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="card-title mb-0">Grade Submission</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Assignment Information</h5>
+                        <p><strong>Title:</strong> {{ submission.assignment.title }}</p>
+                        <p><strong>Deadline:</strong> {{ submission.assignment.deadline|date:"M d, Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Submission Information</h5>
+                        <p><strong>Student:</strong> {{ submission.student.username }}</p>
+                        <p><strong>Submitted:</strong> {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
+                        <p>
+                            <strong>Status:</strong>
+                            {% if submission.submitted_at <= submission.assignment.deadline %}
+                                <span class="badge bg-success">On Time</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Late</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Student Submission</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Submitted File:</strong></p>
+                        <a href="{{ submission.file.url }}" class="btn btn-primary mb-3" download>
+                            Download Submission
+                        </a>
+                        
+                        <div class="embed-responsive embed-responsive-16by9 mt-3">
+                            {% if submission.file.url|lower|slice:"-4:" == ".pdf" %}
+                                <embed src="{{ submission.file.url }}" type="application/pdf" width="100%" height="600px">
+                            {% elif submission.file.url|lower|slice:"-4:" == ".jpg" or submission.file.url|lower|slice:"-4:" == ".png" or submission.file.url|lower|slice:"-5:" == ".jpeg" %}
+                                <img src="{{ submission.file.url }}" class="img-fluid" alt="submission image">
+                            {% else %}
+                                <p class="text-muted">Preview not available for this file type. Please download to view.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Grade Submission</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="grade" class="form-label">Grade</label>
+                                <input type="number" name="grade" id="grade" min="0" max="100" step="0.1" class="form-control" value="{{ submission.grade|default:'' }}" required>
+                                <div class="form-text">Enter a grade between 0-100.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="comments" class="form-label">Comments</label>
+                                <textarea name="comments" id="comments" rows="4" class="form-control">{{ submission.comments|default:'' }}</textarea>
+                                <div class="form-text">Provide feedback to the student about their work.</div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'view_assignment' submission.assignment.id %}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-success">Save Grade</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

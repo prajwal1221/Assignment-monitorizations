@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Dashboard - Assignment Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Teacher Dashboard</h1>
+            <a href="{% url 'create_assignment' %}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Create New Assignment
+            </a>
+        </div>
+        
+        {% if assignments %}
+            <div class="card shadow mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Your Assignments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Created</th>
+                                    <th>Deadline</th>
+                                    <th>Submissions</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assignment in assignments %}
+                                <tr>
+                                    <td>{{ assignment.title }}</td>
+                                    <td>{{ assignment.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if assignment.deadline < now %}
+                                            <span class="past-deadline">{{ assignment.deadline|date:"M d, Y H:i" }}</span>
+                                        {% else %}
+                                            {{ assignment.deadline|date:"M d, Y H:i" }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ assignment.submission_set.count }}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'view_assignment' assignment.id %}" class="btn btn-primary btn-sm">View Details</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <p>You haven't created any assignments yet.</p>
+                <a href="{% url 'create_assignment' %}" class="btn btn-success">Create your first assignment</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

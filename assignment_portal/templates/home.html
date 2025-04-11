@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Assignment Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <h1 class="card-title mb-4">Welcome to Assignment Portal</h1>
+                <p class="lead">A platform for teachers to create assignments and students to submit their work.</p>
+                
+                {% if not user.is_authenticated %}
+                    <div class="mt-5">
+                        <h3>Get Started</h3>
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <h4>For Students</h4>
+                                        <p>Submit assignments, track deadlines, and check your grades.</p>
+                                        <a href="{% url 'student_signup' %}" class="btn btn-primary">Student Sign Up</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <h4>For Teachers</h4>
+                                        <p>Create assignments, review submissions, and provide feedback.</p>
+                                        <a href="{% url 'teacher_signup' %}" class="btn btn-success">Teacher Sign Up</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="mt-5">
+                        <h3>Go to Your Dashboard</h3>
+                        {% if user.is_teacher %}
+                            <a href="{% url 'teacher_dashboard' %}" class="btn btn-success btn-lg mt-3">Teacher Dashboard</a>
+                        {% elif user.is_student %}
+                            <a href="{% url 'student_dashboard' %}" class="btn btn-primary btn-lg mt-3">Student Dashboard</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card shadow mt-5">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Features</h2>
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <h4>Assignment Management</h4>
+                        <p>Create, view, and manage assignments with deadlines</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h4>Submission System</h4>
+                        <p>Upload and track assignment submissions</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h4>Feedback & Grading</h4>
+                        <p>Review submissions and provide grades</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
